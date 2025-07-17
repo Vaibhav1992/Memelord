@@ -27,7 +27,8 @@ function App() {
         NODE_ENV: import.meta.env.NODE_ENV
       });
       
-      const backendUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      // Use relative URL in production, localhost in development
+      const backendUrl = import.meta.env.DEV ? 'http://localhost:3001' : '';
       console.log('Using backend URL:', backendUrl);
       
       const response = await fetch(`${backendUrl}/api/rooms`, {
@@ -48,7 +49,8 @@ function App() {
 
   const joinRoom = async (roomId, playerName, avatar) => {
     try {
-      const backendUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      // Use relative URL in production, localhost in development
+      const backendUrl = import.meta.env.DEV ? 'http://localhost:3001' : '';
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}/join`, {
         method: 'POST',
         headers: {
@@ -71,7 +73,9 @@ function App() {
   };
 
   const connectToRoom = (roomId, playerId) => {
-    const newSocket = io(import.meta.env.DEV ? 'http://localhost:3001' : import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001');
+    // Use relative URL in production, localhost in development
+    const socketUrl = import.meta.env.DEV ? 'http://localhost:3001' : '';
+    const newSocket = io(socketUrl);
     
     newSocket.on('connect', () => {
       console.log('Connected to server');
