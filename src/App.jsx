@@ -21,7 +21,8 @@ function App() {
 
   const createRoom = async (settings) => {
     try {
-      const response = await fetch('/api/rooms', {
+      const backendUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/api/rooms`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +40,8 @@ function App() {
 
   const joinRoom = async (roomId, playerName, avatar) => {
     try {
-      const response = await fetch(`/api/rooms/${roomId}/join`, {
+      const backendUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/api/rooms/${roomId}/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +63,7 @@ function App() {
   };
 
   const connectToRoom = (roomId, playerId) => {
-    const newSocket = io(import.meta.env.DEV ? 'http://localhost:3001' : '');
+    const newSocket = io(import.meta.env.DEV ? 'http://localhost:3001' : import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001');
     
     newSocket.on('connect', () => {
       console.log('Connected to server');
