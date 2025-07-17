@@ -70,7 +70,10 @@ function App() {
 
     newSocket.on('room_state', (state) => {
       setRoom(state.room);
-      setGameState(state.gameState);
+      setGameState({
+        ...state.gameState,
+        players: state.players // Ensure players are included in gameState
+      });
       setPlayer(state.players.find(p => p.id === playerId));
     });
 
@@ -96,21 +99,24 @@ function App() {
         currentMeme: data.meme,
         timer: data.timer,
         captions: [],
-        votes: new Map()
+        votes: {}, // Use plain object instead of Map
+        players: prev.players // Preserve the players array
       }));
     });
 
     newSocket.on('timer_tick', ({ secondsLeft }) => {
       setGameState(prev => ({
         ...prev,
-        timer: secondsLeft
+        timer: secondsLeft,
+        players: prev.players // Preserve the players array
       }));
     });
 
     newSocket.on('caption_submitted', (caption) => {
       setGameState(prev => ({
         ...prev,
-        captions: [...(prev.captions || []), caption]
+        captions: [...(prev.captions || []), caption],
+        players: prev.players // Preserve the players array
       }));
     });
 
@@ -119,17 +125,19 @@ function App() {
         ...prev,
         phase: 'vote',
         captions,
-        timer
+        timer,
+        players: prev.players // Preserve the players array
       }));
     });
 
     newSocket.on('vote_submitted', ({ captionId, voterId }) => {
       setGameState(prev => {
-        const newVotes = new Map(prev.votes || []);
-        newVotes.set(voterId, { captionId, voterId });
+        const newVotes = { ...(prev.votes || {}) };
+        newVotes[voterId] = { captionId, voterId };
         return {
           ...prev,
-          votes: newVotes
+          votes: newVotes,
+          players: prev.players // Preserve the players array
         };
       });
     });
@@ -139,8 +147,9 @@ function App() {
         ...prev,
         phase: 'results',
         roundScores,
-        scores: new Map(Object.entries(totalScores)),
-        captions
+        scores: totalScores, // Use plain object instead of Map
+        captions,
+        players: prev.players // Preserve the players array
       }));
     });
 
@@ -150,7 +159,8 @@ function App() {
         phase: 'ended',
         winner,
         finalScores,
-        allPlayers: players
+        allPlayers: players,
+        players: prev.players // Preserve the players array
       }));
     });
 

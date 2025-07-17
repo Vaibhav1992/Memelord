@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Confetti from './Confetti';
 
 const GameEndModal = ({ winner, finalScores, players, onPlayAgain }) => {
   const [showConfetti, setShowConfetti] = useState(true);
@@ -18,27 +19,11 @@ const GameEndModal = ({ winner, finalScores, players, onPlayAgain }) => {
     return scoreB - scoreA;
   });
 
-  const createConfetti = () => {
-    const confetti = [];
-    for (let i = 0; i < 50; i++) {
-      confetti.push(
-        <div
-          key={i}
-          className="confetti"
-          style={{
-            left: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 3}s`,
-            backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'][Math.floor(Math.random() * 5)]
-          }}
-        />
-      );
-    }
-    return confetti;
-  };
+
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-      {showConfetti && createConfetti()}
+      <Confetti isActive={showConfetti} />
       
       <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full max-h-[80vh] overflow-y-auto">
         <div className="text-center mb-6">

@@ -7,28 +7,8 @@ import Leaderboard from './Leaderboard';
 import GameEndModal from './GameEndModal';
 
 const GameRoom = ({ socket, gameState, player, room, onLeaveRoom }) => {
-  const [players, setPlayers] = useState([]);
-
-  useEffect(() => {
-    // Listen for player updates
-    socket.on('room_state', (state) => {
-      setPlayers(state.players);
-    });
-
-    socket.on('player_joined', (newPlayer) => {
-      setPlayers(prev => [...prev, newPlayer]);
-    });
-
-    socket.on('player_left', ({ playerId }) => {
-      setPlayers(prev => prev.filter(p => p.id !== playerId));
-    });
-
-    return () => {
-      socket.off('room_state');
-      socket.off('player_joined');
-      socket.off('player_left');
-    };
-  }, [socket]);
+  // Use players from gameState instead of local state
+  const players = gameState.players || [];
 
   const handleStartGame = () => {
     socket.emit('start_game');

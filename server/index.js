@@ -62,8 +62,8 @@ function createRoom(settings = {}) {
       currentRound: 0,
       currentMeme: null,
       captions: [],
-      votes: new Map(),
-      scores: new Map(),
+      votes: {},
+      scores: {},
       timer: 0
     },
     createdAt: Date.now(),
@@ -83,8 +83,11 @@ function startNewRound(room) {
   room.gameState.phase = 'caption';
   room.gameState.currentMeme = getRandomMeme();
   room.gameState.captions = [];
-  room.gameState.votes.clear();
+  room.gameState.votes = {};
   room.gameState.timer = room.settings.captionTimer;
+  
+  console.log(`Starting round ${room.gameState.currentRound} for room ${room.code} with ${room.players.length} players`);
+  console.log('Players:', room.players.map(p => p.name));
   
   // Broadcast new round
   io.to(room.id).emit('round_start', {
@@ -108,7 +111,7 @@ function startTimer(room) {
       if (room.gameState.phase === 'caption') {
         // Switch to voting phase
         room.gameState.phase = 'vote';
-        room.gameState.timer = room.settings.captionTimer;
+        room.gameState.timer = 20; // 20 seconds for voting
         io.to(room.id).emit('vote_phase_start', { 
           captions: room.gameState.captions,
           timer: room.gameState.timer
@@ -124,21 +127,21 @@ function startTimer(room) {
 
 function endRound(room) {
   // Calculate scores for this round
-  const roundScores = new Map();
+  const roundScores = {};
   room.gameState.captions.forEach(caption => {
-    const votes = Array.from(room.gameState.votes.values()).filter(vote => vote.captionId === caption.id).length;
-    roundScores.set(caption.playerId, votes);
+    const votes = Object.values(room.gameState.votes).filter(vote => vote.captionId === caption.id).length;
+    roundScores[caption.playerId] = votes;
     
     // Add to total scores
-    const currentScore = room.gameState.scores.get(caption.playerId) || 0;
-    room.gameState.scores.set(caption.playerId, currentScore + votes);
+    const currentScore = room.gameState.scores[caption.playerId] || 0;
+    room.gameState.scores[caption.playerId] = currentScore + votes;
   });
   
   room.gameState.phase = 'results';
   
   io.to(room.id).emit('round_end', {
-    roundScores: Object.fromEntries(roundScores),
-    totalScores: Object.fromEntries(room.gameState.scores),
+    roundScores: roundScores,
+    totalScores: room.gameState.scores,
     captions: room.gameState.captions
   });
   
@@ -157,7 +160,7 @@ function endGame(room) {
   let winner = null;
   let highestScore = -1;
   
-  for (const [playerId, score] of room.gameState.scores) {
+  for (const [playerId, score] of Object.entries(room.gameState.scores)) {
     if (score > highestScore) {
       highestScore = score;
       winner = room.players.find(p => p.id === playerId);
@@ -166,7 +169,7 @@ function endGame(room) {
   
   io.to(room.id).emit('game_end', {
     winner,
-    finalScores: Object.fromEntries(room.gameState.scores),
+    finalScores: room.gameState.scores,
     players: room.players
   });
 }
@@ -209,7 +212,7 @@ app.post('/api/rooms/:id/join', (req, res) => {
   };
   
   room.players.push(player);
-  room.gameState.scores.set(playerId, 0);
+  room.gameState.scores[playerId] = 0;
   players.set(playerId, { roomId: id, ...player });
   
   res.json({
@@ -260,6 +263,8 @@ io.on('connection', (socket) => {
     socket.playerId = playerId;
     socket.roomId = roomId;
     
+    console.log(`Player ${player.name} joined room ${room.code} (${room.players.length} players total)`);
+    
     // Send current room state
     socket.emit('room_state', {
       room: {
@@ -284,6 +289,7 @@ io.on('connection', (socket) => {
       return;
     }
     
+    console.log(`Game started by player ${players.get(socket.playerId)?.name} in room ${room.code}`);
     startNewRound(room);
   });
   
@@ -310,6 +316,18 @@ io.on('connection', (socket) => {
     
     // Broadcast new caption
     io.to(socket.roomId).emit('caption_submitted', caption);
+    
+    // Check if all players have submitted captions
+    if (room.gameState.captions.length === room.players.length) {
+      // All players submitted, move to voting phase immediately
+      room.gameState.phase = 'vote';
+      room.gameState.timer = 20; // 20 seconds for voting
+      io.to(socket.roomId).emit('vote_phase_start', { 
+        captions: room.gameState.captions,
+        timer: room.gameState.timer
+      });
+      startTimer(room);
+    }
   });
   
   socket.on('submit_vote', ({ captionId }) => {
@@ -320,20 +338,28 @@ io.on('connection', (socket) => {
     const caption = room.gameState.captions.find(c => c.id === captionId);
     if (!caption || caption.playerId === socket.playerId) return;
     
-    // Check if already voted
-    if (room.gameState.votes.has(socket.playerId)) return;
-    
-    room.gameState.votes.set(socket.playerId, {
+    // Allow changing votes or voting multiple times
+    room.gameState.votes[socket.playerId] = {
       captionId,
       voterId: socket.playerId,
       votedAt: Date.now()
-    });
+    };
     
     // Broadcast vote
     io.to(socket.roomId).emit('vote_submitted', {
       captionId,
       voterId: socket.playerId
     });
+    
+    // Check if all eligible voters have voted (excluding caption authors)
+    const captionAuthors = room.gameState.captions.map(c => c.playerId);
+    const eligibleVoters = room.players.filter(p => !captionAuthors.includes(p.id));
+    const votedCount = Object.keys(room.gameState.votes).length;
+    
+    if (votedCount === eligibleVoters.length) {
+      // All eligible voters have voted, end round immediately
+      endRound(room);
+    }
   });
   
   socket.on('disconnect', () => {

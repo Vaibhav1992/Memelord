@@ -1,122 +1,16 @@
 [
-  {
-    "id": "distracted-boyfriend",
-    "filename": "https://i.imgflip.com/1ur9b0.jpg",
-    "title": "Distracted Boyfriend",
-    "description": "Programmer looking at new framework while current project waits"
-  },
-  {
-    "id": "drake-pointing",
-    "filename": "https://i.imgflip.com/30b1gx.jpg",
-    "title": "Drake Pointing",
-    "description": "Drake disapproving of bugs vs approving of features"
-  },
-  {
-    "id": "woman-yelling-cat",
-    "filename": "https://i.imgflip.com/345v97.jpg",
-    "title": "Woman Yelling at Cat",
-    "description": "Product manager yelling at confused developer cat"
-  },
-  {
-    "id": "this-is-fine",
-    "filename": "https://i.imgflip.com/26am.jpg",
-    "title": "This is Fine",
-    "description": "Developer in burning server room saying 'This is fine'"
-  },
-  {
-    "id": "expanding-brain",
-    "filename": "https://i.imgflip.com/1jhl6f.jpg",
-    "title": "Expanding Brain",
-    "description": "Four levels of programming enlightenment"
-  },
-  {
-    "id": "change-my-mind",
-    "filename": "https://i.imgflip.com/24y43o.jpg",
-    "title": "Change My Mind",
-    "description": "Controversial programming opinion at the table"
-  },
-  {
-    "id": "two-buttons",
-    "filename": "https://i.imgflip.com/1g8my4.jpg",
-    "title": "Two Buttons",
-    "description": "Developer sweating over technical decisions"
-  },
-  {
-    "id": "surprised-pikachu",
-    "filename": "https://i.imgflip.com/2kbn1e.jpg",
-    "title": "Surprised Pikachu",
-    "description": "When your code actually works on first try"
-  },
-  {
-    "id": "batman-slapping",
-    "filename": "https://i.imgflip.com/9ehk.jpg",
-    "title": "Batman Slapping Robin",
-    "description": "Senior dev stopping junior from bad practices"
-  },
-  {
-    "id": "roll-safe",
-    "filename": "https://i.imgflip.com/1h7in3.jpg",
-    "title": "Roll Safe",
-    "description": "Smart guy pointing at head with coding wisdom"
-  },
-  {
-    "id": "disaster-girl",
-    "filename": "https://i.imgflip.com/2dls19.jpg",
-    "title": "Disaster Girl",
-    "description": "Girl smiling while production burns behind her"
-  },
-  {
-    "id": "hide-the-pain-harold",
-    "filename": "https://i.imgflip.com/gk5el.jpg",
-    "title": "Hide the Pain Harold",
-    "description": "Forced smile while dealing with legacy code"
-  },
-  {
-    "id": "success-kid",
-    "filename": "https://i.imgflip.com/1bhf.jpg",
-    "title": "Success Kid",
-    "description": "When your code compiles without errors"
-  },
-  {
-    "id": "philosoraptor",
-    "filename": "https://i.imgflip.com/s2qd.jpg",
-    "title": "Philosoraptor",
-    "description": "Deep thoughts about programming paradoxes"
-  },
-  {
-    "id": "first-world-problems",
-    "filename": "https://i.imgflip.com/c2qn.jpg",
-    "title": "First World Problems",
-    "description": "Developer complaining about minor inconveniences"
-  },
-  {
-    "id": "one-does-not-simply",
-    "filename": "https://i.imgflip.com/1bij.jpg",
-    "title": "One Does Not Simply",
-    "description": "Boromir explaining why simple tasks are actually complex"
-  },
-  {
-    "id": "y-u-no",
-    "filename": "https://i.imgflip.com/2pjr.jpg",
-    "title": "Y U No",
-    "description": "Frustrated face asking why code doesn't work"
-  },
-  {
-    "id": "ancient-aliens",
-    "filename": "https://i.imgflip.com/26hg.jpg",
-    "title": "Ancient Aliens",
-    "description": "Giorgio explaining mysterious code behavior"
-  },
-  {
-    "id": "grumpy-cat",
-    "filename": "https://i.imgflip.com/30854m.jpg",
-    "title": "Grumpy Cat",
-    "description": "Cat disapproving of your programming choices"
-  },
-  {
-    "id": "kermit-tea",
-    "filename": "https://i.imgflip.com/16iyn1.jpg",
-    "title": "But That's None of My Business",
-    "description": "Kermit sipping tea while making coding observations"
-  }
+  { "id": "distracted-boyfriend", "filename": "images/distracted-boyfriend.jpg", "title": "Distracted Boyfriend", "description": "Programmer looking at new framework while current project waits" },
+  { "id": "drake-pointing", "filename": "images/drake-pointing.jpg", "title": "Drake Pointing", "description": "Drake disapproving of bugs vs approving of features" },
+  { "id": "this-is-fine", "filename": "images/this-is-fine.jpg", "title": "This is Fine", "description": "Developer in burning server room saying 'This is fine'" },
+  { "id": "batman-slapping", "filename": "images/batman-slapping.jpg", "title": "Batman Slapping Robin", "description": "Senior dev stopping junior from bad practices" },
+  { "id": "woman-yelling-cat", "filename": "images/woman-yelling-cat.jpg", "title": "Woman Yelling at Cat", "description": "Product manager yelling at confused developer cat" },
+  { "id": "change-my-mind", "filename": "images/change-my-mind.jpg", "title": "Change My Mind", "description": "Controversial programming opinion at the table" },
+  { "id": "two-buttons", "filename": "images/two-buttons.jpg", "title": "Two Buttons", "description": "Developer sweating over technical decisions" },
+  { "id": "success-kid", "filename": "images/success-kid.jpg", "title": "Success Kid", "description": "When your code compiles without errors" },
+  { "id": "clean-everything", "filename": "images/clean_everything.jpg", "title": "Clean Everything", "description": "When you decide to refactor the entire codebase" },
+  { "id": "computer-stare", "filename": "images/computer_stare.jpg", "title": "Computer Stare", "description": "Staring at the screen waiting for code to compile" },
+  { "id": "im-watching-u", "filename": "images/im_watching_u.jpg", "title": "I'm Watching You", "description": "Code reviewer watching your pull request" },
+  { "id": "keyboard-break", "filename": "images/keyboard_break.jpg", "title": "Keyboard Break", "description": "When the code doesn't work for the 100th time" },
+  { "id": "nothing-to-do-here", "filename": "images/nothing_to_do_here.jpg", "title": "Nothing to Do Here", "description": "When you find a bug but it's not your problem" },
+  { "id": "okay-guy-no", "filename": "images/okay_guy_no.jpg", "title": "Okay Guy No", "description": "When your feature request gets rejected" }
 ]

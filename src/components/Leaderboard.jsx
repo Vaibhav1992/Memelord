@@ -2,8 +2,8 @@ import React from 'react';
 
 const Leaderboard = ({ players, scores, currentRound }) => {
   const sortedPlayers = [...players].sort((a, b) => {
-    const scoreA = scores?.get(a.id) || 0;
-    const scoreB = scores?.get(b.id) || 0;
+    const scoreA = scores?.[a.id] || 0;
+    const scoreB = scores?.[b.id] || 0;
     return scoreB - scoreA;
   });
 
@@ -15,7 +15,7 @@ const Leaderboard = ({ players, scores, currentRound }) => {
       
       <div className="space-y-2">
         {sortedPlayers.map((player, index) => {
-          const score = scores?.get(player.id) || 0;
+          const score = scores?.[player.id] || 0;
           const isFirst = index === 0 && score > 0;
           
           return (
