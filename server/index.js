@@ -248,15 +248,41 @@ app.get('/api/rooms/:code/info', (req, res) => {
   });
 });
 
+// Test route to verify server is working
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'Server is working!',
+    nodeEnv: process.env.NODE_ENV,
+    serverDir: __dirname,
+    distPath: path.resolve(__dirname, '../dist'),
+    distExists: require('fs').existsSync(path.resolve(__dirname, '../dist'))
+  });
+});
+
 // Serve frontend files in production (must be after API routes)
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.resolve(__dirname, '../dist');
+  console.log('Production mode detected');
+  console.log('Server directory:', __dirname);
+  console.log('Dist path:', distPath);
+  console.log('Dist exists:', require('fs').existsSync(distPath));
+  
+  if (require('fs').existsSync(distPath)) {
+    console.log('Dist contents:', require('fs').readdirSync(distPath));
+  }
+  
   app.use(express.static(distPath));
   
   // Serve index.html for all routes (SPA)
   app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+    console.log('Serving SPA route:', req.path);
+    const indexPath = path.join(distPath, 'index.html');
+    console.log('Index path:', indexPath);
+    console.log('Index exists:', require('fs').existsSync(indexPath));
+    res.sendFile(indexPath);
   });
+} else {
+  console.log('Development mode - not serving static files');
 }
 
 // Socket.IO connection handling
