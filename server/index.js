@@ -250,11 +250,12 @@ app.get('/api/rooms/:code/info', (req, res) => {
 
 // Serve frontend files in production (must be after API routes)
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
+  const distPath = path.resolve(__dirname, '../dist');
+  app.use(express.static(distPath));
   
   // Serve index.html for all routes (SPA)
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
+    res.sendFile(path.join(distPath, 'index.html'));
   });
 }
 
