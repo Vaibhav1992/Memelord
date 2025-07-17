@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' ? false : "http://localhost:5173",
+    origin: process.env.NODE_ENV === 'production' ? "*" : "http://localhost:5173",
     methods: ["GET", "POST"]
   }
 });
@@ -20,6 +20,16 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 app.use('/memes', express.static(path.join(__dirname, 'assets/memes')));
+
+// Serve frontend files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../dist')));
+  
+  // Serve index.html for all routes (SPA)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+  });
+}
 
 // In-memory storage
 const rooms = new Map();
