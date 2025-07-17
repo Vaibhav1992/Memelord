@@ -409,7 +409,7 @@ setInterval(() => {
     }
   }
 }, 60000); // Check every minute
-fixed
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
