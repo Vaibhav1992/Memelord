@@ -21,15 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/memes', express.static(path.join(__dirname, 'assets/memes')));
 
-// Serve frontend files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
-  
-  // Serve index.html for all routes (SPA)
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
-  });
-}
+
 
 // In-memory storage
 const rooms = new Map();
@@ -256,6 +248,16 @@ app.get('/api/rooms/:code/info', (req, res) => {
   });
 });
 
+// Serve frontend files in production (must be after API routes)
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../dist')));
+  
+  // Serve index.html for all routes (SPA)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+  });
+}
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -407,16 +409,7 @@ setInterval(() => {
     }
   }
 }, 60000); // Check every minute
-
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
-  });
-}
-
+fixed
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
