@@ -260,17 +260,17 @@ app.get('/api/test', (req, res) => {
 });
 
 // Serve frontend files in production (must be after API routes)
-if (process.env.NODE_ENV === 'production') {
-  const distPath = path.resolve(__dirname, '../dist');
-  console.log('Production mode detected');
-  console.log('Server directory:', __dirname);
-  console.log('Dist path:', distPath);
-  console.log('Dist exists:', require('fs').existsSync(distPath));
-  
-  if (require('fs').existsSync(distPath)) {
-    console.log('Dist contents:', require('fs').readdirSync(distPath));
-  }
-  
+// Always serve static files in production or when dist folder exists
+const distPath = path.resolve(__dirname, '../dist');
+const distExists = require('fs').existsSync(distPath);
+
+console.log('Server directory:', __dirname);
+console.log('Dist path:', distPath);
+console.log('Dist exists:', distExists);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
+if (distExists) {
+  console.log('Dist contents:', require('fs').readdirSync(distPath));
   app.use(express.static(distPath));
   
   // Serve index.html for all routes (SPA)
@@ -282,7 +282,7 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(indexPath);
   });
 } else {
-  console.log('Development mode - not serving static files');
+  console.log('Dist folder not found - not serving static files');
 }
 
 // Socket.IO connection handling

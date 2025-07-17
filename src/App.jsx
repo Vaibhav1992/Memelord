@@ -21,7 +21,15 @@ function App() {
 
   const createRoom = async (settings) => {
     try {
+      console.log('Environment check:', {
+        DEV: import.meta.env.DEV,
+        VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
+        NODE_ENV: import.meta.env.NODE_ENV
+      });
+      
       const backendUrl = import.meta.env.DEV ? '' : import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      console.log('Using backend URL:', backendUrl);
+      
       const response = await fetch(`${backendUrl}/api/rooms`, {
         method: 'POST',
         headers: {
