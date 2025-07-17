@@ -22,12 +22,6 @@ const GameRoom = ({ socket, gameState, player, room, onLeaveRoom }) => {
     socket.emit('submit_vote', { captionId });
   };
 
-  const formatTimer = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   if (gameState.phase === 'waiting') {
     return (
       <div className="min-h-screen p-4">
@@ -128,14 +122,22 @@ const GameRoom = ({ socket, gameState, player, room, onLeaveRoom }) => {
             {/* Phase Status */}
             <div className="text-center">
               {gameState.phase === 'caption' && (
-                <p className="text-lg text-yellow-400">
-                  💭 Caption this meme! ({formatTimer(gameState.timer)} remaining)
-                </p>
+                <div className="text-lg text-yellow-400">
+                  <p>💭 Caption this meme!</p>
+                  <div className="flex justify-center items-center gap-2 mt-2">
+                    <Timer seconds={gameState.timer} />
+                    <span>remaining</span>
+                  </div>
+                </div>
               )}
               {gameState.phase === 'vote' && (
-                <p className="text-lg text-blue-400">
-                  🗳️ Vote for your favorite caption! ({formatTimer(gameState.timer)} remaining)
-                </p>
+                <div className="text-lg text-blue-400">
+                  <p>🗳️ Vote for your favorite caption!</p>
+                  <div className="flex justify-center items-center gap-2 mt-2">
+                    <Timer seconds={gameState.timer} />
+                    <span>remaining</span>
+                  </div>
+                </div>
               )}
               {gameState.phase === 'results' && (
                 <p className="text-lg text-green-400">

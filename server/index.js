@@ -66,7 +66,8 @@ function createRoom(settings = {}) {
       captions: [],
       votes: {},
       scores: {},
-      timer: 0
+      timer: 0,
+      usedMemes: [] // Track which memes have been used in this game
     },
     createdAt: Date.now(),
     lastActivity: Date.now()
@@ -76,20 +77,37 @@ function createRoom(settings = {}) {
   return room;
 }
 
-function getRandomMeme() {
-  return memes[Math.floor(Math.random() * memes.length)];
+function getRandomMeme(room) {
+  // Get available memes (not used yet)
+  const availableMemes = memes.filter(meme => !room.gameState.usedMemes.includes(meme.id));
+  
+  // If all memes have been used, reset the used memes list
+  if (availableMemes.length === 0) {
+    room.gameState.usedMemes = [];
+    return memes[Math.floor(Math.random() * memes.length)];
+  }
+  
+  // Pick a random meme from available ones
+  return availableMemes[Math.floor(Math.random() * availableMemes.length)];
 }
 
 function startNewRound(room) {
   room.gameState.currentRound++;
   room.gameState.phase = 'caption';
-  room.gameState.currentMeme = getRandomMeme();
+  room.gameState.currentMeme = getRandomMeme(room);
+  
+  // Track this meme as used
+  if (room.gameState.currentMeme) {
+    room.gameState.usedMemes.push(room.gameState.currentMeme.id);
+  }
+  
   room.gameState.captions = [];
   room.gameState.votes = {};
   room.gameState.timer = room.settings.captionTimer;
   
   console.log(`Starting round ${room.gameState.currentRound} for room ${room.code} with ${room.players.length} players`);
   console.log('Players:', room.players.map(p => p.name));
+  console.log(`Selected meme: ${room.gameState.currentMeme?.title} (${room.gameState.usedMemes.length}/${memes.length} memes used)`);
   
   // Broadcast new round
   io.to(room.id).emit('round_start', {
@@ -103,12 +121,19 @@ function startNewRound(room) {
 }
 
 function startTimer(room) {
-  const interval = setInterval(() => {
+  // Clear any existing timer first
+  if (room.timerInterval) {
+    clearInterval(room.timerInterval);
+    room.timerInterval = null;
+  }
+  
+  room.timerInterval = setInterval(() => {
     room.gameState.timer--;
     io.to(room.id).emit('timer_tick', { secondsLeft: room.gameState.timer });
     
     if (room.gameState.timer <= 0) {
-      clearInterval(interval);
+      clearInterval(room.timerInterval);
+      room.timerInterval = null;
       
       if (room.gameState.phase === 'caption') {
         // Switch to voting phase
@@ -157,6 +182,12 @@ function endRound(room) {
 
 function endGame(room) {
   room.gameState.phase = 'ended';
+  
+  // Clear any running timer
+  if (room.timerInterval) {
+    clearInterval(room.timerInterval);
+    room.timerInterval = null;
+  }
   
   // Find winner
   let winner = null;
@@ -285,6 +316,31 @@ if (distExists) {
   console.log('Dist folder not found - not serving static files');
 }
 
+// Cleanup inactive rooms every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  const inactiveThreshold = 15 * 60 * 1000; // 15 minutes
+  
+  for (const [roomId, room] of rooms.entries()) {
+    if (now - room.lastActivity > inactiveThreshold) {
+      console.log(`Cleaning up inactive room: ${room.code}`);
+      
+      // Clear any running timer
+      if (room.timerInterval) {
+        clearInterval(room.timerInterval);
+        room.timerInterval = null;
+      }
+      
+      // Remove players from memory
+      room.players.forEach(player => {
+        players.delete(player.id);
+      });
+      
+      rooms.delete(roomId);
+    }
+  }
+}, 5 * 60 * 1000); // Run every 5 minutes
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -301,6 +357,9 @@ io.on('connection', (socket) => {
     socket.join(roomId);
     socket.playerId = playerId;
     socket.roomId = roomId;
+    
+    // Update room activity
+    room.lastActivity = Date.now();
     
     console.log(`Player ${player.name} joined room ${room.code} (${room.players.length} players total)`);
     
@@ -336,6 +395,9 @@ io.on('connection', (socket) => {
     const room = rooms.get(socket.roomId);
     if (!room || room.gameState.phase !== 'caption') return;
     
+    // Update room activity
+    room.lastActivity = Date.now();
+    
     // Check if player already submitted
     const existingCaption = room.gameState.captions.find(c => c.playerId === socket.playerId);
     if (existingCaption) return;
@@ -359,6 +421,12 @@ io.on('connection', (socket) => {
     // Check if all players have submitted captions
     if (room.gameState.captions.length === room.players.length) {
       // All players submitted, move to voting phase immediately
+      // Clear existing timer first to prevent race conditions
+      if (room.timerInterval) {
+        clearInterval(room.timerInterval);
+        room.timerInterval = null;
+      }
+      
       room.gameState.phase = 'vote';
       room.gameState.timer = 20; // 20 seconds for voting
       io.to(socket.roomId).emit('vote_phase_start', { 
@@ -372,6 +440,9 @@ io.on('connection', (socket) => {
   socket.on('submit_vote', ({ captionId }) => {
     const room = rooms.get(socket.roomId);
     if (!room || room.gameState.phase !== 'vote') return;
+    
+    // Update room activity
+    room.lastActivity = Date.now();
     
     // Check if voting for own caption
     const caption = room.gameState.captions.find(c => c.id === captionId);
@@ -397,6 +468,12 @@ io.on('connection', (socket) => {
     
     if (votedCount === eligibleVoters.length) {
       // All eligible voters have voted, end round immediately
+      // Clear existing timer first to prevent race conditions
+      if (room.timerInterval) {
+        clearInterval(room.timerInterval);
+        room.timerInterval = null;
+      }
+      
       endRound(room);
     }
   });
@@ -415,6 +492,11 @@ io.on('connection', (socket) => {
         
         // Clean up empty rooms
         if (room.players.length === 0) {
+          // Clear any running timer
+          if (room.timerInterval) {
+            clearInterval(room.timerInterval);
+            room.timerInterval = null;
+          }
           rooms.delete(socket.roomId);
         }
       }
