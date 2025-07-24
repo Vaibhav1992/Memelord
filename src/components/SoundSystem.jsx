@@ -16,9 +16,7 @@ const SoundSystem = ({
   const audioContext = useRef(null);
   const gainNode = useRef(null);
   const lastTimerSound = useRef(0);
-  const ambientAudio = useRef(null);
-  const [isAmbientPlaying, setIsAmbientPlaying] = useState(false);
-  const [ambientVolume, setAmbientVolume] = useState(volume); // Use prop for volume
+  // Removed ambient music - only keeping game sound effects
 
   const initializeAudio = () => {
     if (!audioContext.current) {
@@ -38,72 +36,12 @@ const SoundSystem = ({
     }
   };
 
-  // Initialize ambient music
-  const initializeAmbientMusic = () => {
-    if (!ambientAudio.current) {
-      // Create a simple ambient loop using Web Audio API
-      const createAmbientLoop = () => {
-        if (!audioContext.current) return;
-        
-        const ambientGain = audioContext.current.createGain();
-        ambientGain.gain.value = ambientVolume;
-        ambientGain.connect(audioContext.current.destination);
-        
-        // Create multiple oscillators for rich ambient sound
-        const oscillators = [];
-        const frequencies = [220, 330, 440, 550]; // A3, E4, A4, C#5
-        const volumes = [0.05, 0.03, 0.02, 0.01]; // Decreasing volumes for depth
-        
-        frequencies.forEach((freq, index) => {
-          const osc = audioContext.current.createOscillator();
-          const gain = audioContext.current.createGain();
-          
-          osc.connect(gain);
-          gain.connect(ambientGain);
-          
-          osc.frequency.value = freq;
-          osc.type = 'sine';
-          gain.gain.value = volumes[index];
-          
-          // Add subtle frequency modulation for movement
-          const lfo = audioContext.current.createOscillator();
-          const lfoGain = audioContext.current.createGain();
-          
-          lfo.connect(lfoGain);
-          lfoGain.connect(osc.frequency);
-          
-          lfo.frequency.value = 0.1; // Very slow modulation
-          lfoGain.gain.value = 2; // Small frequency change
-          
-          lfo.start();
-          osc.start();
-          
-          oscillators.push({ osc, gain, lfo });
-        });
-        
-        // Loop the ambient sound
-        setTimeout(() => {
-          oscillators.forEach(({ osc, gain, lfo }) => {
-            osc.stop();
-            lfo.stop();
-          });
-          if (isAmbientPlaying) {
-            createAmbientLoop();
-          }
-        }, 8000); // 8 second loop
-        
-        return oscillators;
-      };
-      
-      createAmbientLoop();
-    }
-  };
+  // Removed ambient music initialization
 
   useEffect(() => {
     // Initialize on first user interaction
     const handleUserInteraction = () => {
       initializeAudio();
-      initializeAmbientMusic();
       document.removeEventListener('click', handleUserInteraction);
       document.removeEventListener('touchstart', handleUserInteraction);
     };
@@ -116,21 +54,6 @@ const SoundSystem = ({
       document.removeEventListener('touchstart', handleUserInteraction);
     };
   }, []);
-
-  // Update ambient volume when prop changes
-  useEffect(() => {
-    setAmbientVolume(volume);
-  }, [volume]);
-
-  // Start ambient music when game starts
-  useEffect(() => {
-    if (gamePhase && gamePhase !== 'waiting' && !isAmbientPlaying && !isMuted) {
-      setIsAmbientPlaying(true);
-      initializeAmbientMusic();
-    } else if ((gamePhase === 'waiting' || isMuted) && isAmbientPlaying) {
-      setIsAmbientPlaying(false);
-    }
-  }, [gamePhase, isAmbientPlaying, isMuted]);
 
   // Create different sound frequencies and patterns
   const createSound = (frequency, duration, type = 'sine', volume = 0.3) => {
