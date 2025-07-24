@@ -33,7 +33,7 @@ const Timer = ({ seconds, onTick, className = '' }) => {
   };
 
   return (
-    <div className={`relative inline-flex items-center justify-center ${className}`}>
+    <div className={`timer-container ${isUrgent ? 'urgent' : ''} ${className}`}>
       {/* Circular Progress Ring */}
       <svg 
         className="absolute inset-0 w-full h-full -rotate-90" 
@@ -43,47 +43,36 @@ const Timer = ({ seconds, onTick, className = '' }) => {
         <circle
           cx="50"
           cy="50"
-          r="45"
+          r="40"
           fill="none"
           stroke="rgba(255, 255, 255, 0.1)"
-          strokeWidth="6"
+          strokeWidth="4"
         />
         {/* Progress circle */}
         <circle
           cx="50"
           cy="50"
-          r="45"
+          r="40"
           fill="none"
-          stroke={isUrgent ? '#EF4444' : '#8A2BE2'}
-          strokeWidth="6"
+          stroke={isUrgent ? 'var(--secondary-pink)' : 'var(--primary-purple)'}
+          strokeWidth="4"
           strokeLinecap="round"
-          strokeDasharray={`${2 * Math.PI * 45}`}
-          strokeDashoffset={`${2 * Math.PI * 45 * (1 - getProgressPercentage() / 100)}`}
+          strokeDasharray={`${2 * Math.PI * 40}`}
+          strokeDashoffset={`${2 * Math.PI * 40 * (1 - getProgressPercentage() / 100)}`}
           className="transition-all duration-1000 ease-out"
-          style={{
-            filter: isUrgent ? 'drop-shadow(0 0 8px #EF4444)' : 'drop-shadow(0 0 8px #8A2BE2)'
-          }}
         />
       </svg>
       
       {/* Timer Text */}
-      <div className={`relative z-10 font-bold text-lg ${getTimerColor()}`}>
+      <div className="timer-text">
         {formatTime(displaySeconds)}
       </div>
       
       {/* Urgency indicators */}
-      {isUrgent && (
-        <>
-          {/* Pulsing glow effect */}
-          <div className="absolute inset-0 rounded-full bg-red-500 opacity-20 animate-ping"></div>
-          
-          {/* Warning icon for last 5 seconds */}
-          {displaySeconds <= 5 && (
-            <div className="absolute -top-1 -right-1 text-red-400 animate-bounce text-sm">
-              ⚠️
-            </div>
-          )}
-        </>
+      {isUrgent && displaySeconds <= 5 && (
+        <div className="absolute -top-1 -right-1 text-red-400 animate-bounce text-xs">
+          ⚠️
+        </div>
       )}
     </div>
   );
