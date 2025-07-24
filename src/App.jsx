@@ -11,12 +11,129 @@ function App() {
   const [player, setPlayer] = useState(null);
   const [room, setRoom] = useState(null);
   const [playerInfo, setPlayerInfo] = useState({ name: '', avatar: '😀' });
-  // Removed ambient music functionality - only keeping game sound effects
+  const [ambientVolume, setAmbientVolume] = useState(0.05); // Very low volume for app-wide ambient
+  const [isAmbientMuted, setIsAmbientMuted] = useState(false);
+  const ambientAudioContext = useRef(null);
+  const ambientOscillators = useRef([]);
+
+  // Initialize ambient music for the entire app
+  const initializeAmbientMusic = () => {
+    if (!ambientAudioContext.current) {
+      try {
+        ambientAudioContext.current = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Resume audio context if suspended
+        if (ambientAudioContext.current.state === 'suspended') {
+          ambientAudioContext.current.resume();
+        }
+      } catch (error) {
+        console.warn('Web Audio API not supported for ambient music:', error);
+      }
+    }
+  };
+
+    const startAmbientMusic = () => {
+    if (!ambientAudioContext.current || isAmbientMuted) return;
+    
+    try {
+      // Stop existing oscillators
+      stopAmbientMusic();
+      
+      const ambientGain = ambientAudioContext.current.createGain();
+      ambientGain.gain.value = ambientVolume;
+      ambientGain.connect(ambientAudioContext.current.destination);
+      
+      // Create multiple oscillators for rich ambient sound
+      const frequencies = [110, 220, 330, 440]; // A2, A3, E4, A4
+      const volumes = [0.02, 0.015, 0.01, 0.008]; // Very low volumes
+      
+      frequencies.forEach((freq, index) => {
+        const osc = ambientAudioContext.current.createOscillator();
+        const gain = ambientAudioContext.current.createGain();
+        
+        osc.connect(gain);
+        gain.connect(ambientGain);
+        
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        gain.gain.value = volumes[index];
+        
+        // Add very subtle frequency modulation for movement
+        const lfo = ambientAudioContext.current.createOscillator();
+        const lfoGain = ambientAudioContext.current.createGain();
+        
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+        
+        lfo.frequency.value = 0.05; // Very slow modulation
+        lfoGain.gain.value = 1; // Small frequency change
+        
+        lfo.start();
+        osc.start();
+        
+        ambientOscillators.current.push({ osc, gain, lfo });
+      });
+      
+      // Loop the ambient sound
+      setTimeout(() => {
+        if (!isAmbientMuted) {
+          startAmbientMusic();
+        }
+      }, 12000); // 12 second loop
+    } catch (error) {
+      console.warn('Error starting ambient music:', error);
+    }
+  };
+
+  const stopAmbientMusic = () => {
+    ambientOscillators.current.forEach(({ osc, gain, lfo }) => {
+      try {
+        osc.stop();
+        lfo.stop();
+      } catch (error) {
+        // Oscillator might already be stopped
+      }
+    });
+    ambientOscillators.current = [];
+  };
+
+  // Initialize ambient music on first user interaction
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      initializeAmbientMusic();
+      if (!isAmbientMuted) {
+        startAmbientMusic();
+      }
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
+    
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+    
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
+  }, [isAmbientMuted]);
+
+  // Update ambient music when mute state changes
+  useEffect(() => {
+    if (isAmbientMuted) {
+      stopAmbientMusic();
+    } else if (ambientAudioContext.current) {
+      startAmbientMusic();
+    }
+  }, [isAmbientMuted]);
 
   useEffect(() => {
     return () => {
       if (socket) {
         socket.disconnect();
+      }
+      stopAmbientMusic();
+      if (ambientAudioContext.current) {
+        ambientAudioContext.current.close();
       }
     };
   }, [socket]);
@@ -249,6 +366,18 @@ function App() {
             setCurrentView('join');
           }}
         />
+        {/* App-wide ambient music control */}
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => setIsAmbientMuted(!isAmbientMuted)}
+            className="btn-outline p-3 rounded-full hover:scale-105 active:scale-95 transition-all duration-200"
+            title={isAmbientMuted ? "Enable Ambient Music" : "Disable Ambient Music"}
+          >
+            <span className="text-xl">
+              {isAmbientMuted ? '🔇' : '🎵'}
+            </span>
+          </button>
+        </div>
       </>
     );
   }
@@ -262,6 +391,18 @@ function App() {
           playerName={playerInfo.name}
           avatar={playerInfo.avatar}
         />
+        {/* App-wide ambient music control */}
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => setIsAmbientMuted(!isAmbientMuted)}
+            className="btn-outline p-3 rounded-full hover:scale-105 active:scale-95 transition-all duration-200"
+            title={isAmbientMuted ? "Enable Ambient Music" : "Disable Ambient Music"}
+          >
+            <span className="text-xl">
+              {isAmbientMuted ? '🔇' : '🎵'}
+            </span>
+          </button>
+        </div>
       </>
     );
   }
