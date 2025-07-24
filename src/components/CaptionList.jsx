@@ -5,11 +5,13 @@ const CaptionList = ({ captions, votes, players, currentPlayer, phase, onVote, o
   const [selectedCaption, setSelectedCaption] = useState(null);
   const [showVoteConfirmation, setShowVoteConfirmation] = useState(false);
   const [winnerRevealed, setWinnerRevealed] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
 
   useEffect(() => {
     // Reset selection when phase changes
     if (phase !== 'vote') {
       setSelectedCaption(null);
+      setIsVoting(false);
     }
   }, [phase]);
 
@@ -25,6 +27,13 @@ const CaptionList = ({ captions, votes, players, currentPlayer, phase, onVote, o
       }, 1000);
     }
   }, [phase, winnerRevealed, onHurrySound]);
+
+  useEffect(() => {
+    // Reset voting state when votes are updated (server confirmation)
+    if (votes && votes[currentPlayer.id] && isVoting) {
+      setIsVoting(false);
+    }
+  }, [votes, currentPlayer.id, isVoting]);
 
   const getVoteCount = (captionId) => {
     if (!votes) return 0;
@@ -52,22 +61,30 @@ const CaptionList = ({ captions, votes, players, currentPlayer, phase, onVote, o
   };
 
   const canPlayerVote = (caption) => {
-    return phase === 'vote' && caption.playerId !== currentPlayer.id;
+    const hasAlreadyVoted = votes && votes[currentPlayer.id];
+    return phase === 'vote' && caption.playerId !== currentPlayer.id && !hasAlreadyVoted && !isVoting;
   };
 
   const handleVote = (captionId) => {
     const caption = captions.find(c => c.id === captionId);
-    if (!canPlayerVote(caption)) return;
+    if (!canPlayerVote(caption) || isVoting) return;
     
+    // Immediately set voting state to prevent double-clicks
+    setIsVoting(true);
     setSelectedCaption(captionId);
     setShowVoteConfirmation(true);
     
     try {
       onVote(captionId);
-      setTimeout(() => setShowVoteConfirmation(false), 2000);
+      setTimeout(() => {
+        setShowVoteConfirmation(false);
+        // Keep isVoting true until the vote is confirmed by server response
+        // This will be reset when votes state updates from the server
+      }, 2000);
     } catch (error) {
       console.error('Error voting:', error);
       setShowVoteConfirmation(false);
+      setIsVoting(false); // Reset on error
     }
   };
 
@@ -181,12 +198,23 @@ const CaptionList = ({ captions, votes, players, currentPlayer, phase, onVote, o
                   {canVote && (
                     <button
                       onClick={() => handleVote(caption.id)}
-                      className="group/btn bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-medium py-2 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 ring-1 ring-white/20 hover:ring-white/40"
+                      disabled={isVoting}
+                      className={`group/btn font-medium py-2 px-4 rounded-full shadow-lg transition-all duration-300 ring-1 ${
+                        isVoting 
+                          ? 'bg-gray-500 cursor-not-allowed opacity-75' 
+                          : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 hover:shadow-xl hover:scale-105 active:scale-95 ring-white/20 hover:ring-white/40'
+                      } text-white`}
                       style={{ zIndex: 10, position: 'relative' }}
                     >
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm group-hover/btn:scale-110 transition-transform duration-300">👍</span>
-                        <span className="text-sm font-semibold">VOTE</span>
+                        <span className={`text-sm transition-transform duration-300 ${
+                          isVoting ? 'animate-spin' : 'group-hover/btn:scale-110'
+                        }`}>
+                          {isVoting ? '⏳' : '👍'}
+                        </span>
+                        <span className="text-sm font-semibold">
+                          {isVoting ? 'VOTING...' : 'VOTE'}
+                        </span>
                       </div>
                     </button>
                   )}
