@@ -41,21 +41,28 @@ const JoinRoom = ({ onJoinRoom, onBack, playerName, avatar }) => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 animate-fadeIn">
-      <div className="container mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="heading-font text-4xl md:text-6xl text-white mb-4">
-            🚪 <span className="bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">Join Room</span>
-          </h1>
-          <p className="subheading-font text-xl text-gray-300 mb-2">
-            Enter a room code to join the fun!
-          </p>
-          <p className="body-font text-gray-400">
-            Get the 6-digit room code from your host and let&apos;s get started
-          </p>
+      return (
+      <div className="min-h-screen bg-gradient-background animate-fade-in">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-accent-green/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary-purple/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-secondary-blue/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '0.5s' }}></div>
         </div>
+
+        <div className="container mx-auto px-4 py-6 relative z-10">
+          {/* Enhanced Header */}
+          <div className="text-center mb-12">
+            <h1 className="heading-font text-5xl md:text-7xl text-white mb-6 drop-shadow-2xl">
+              🚪 <span className="text-gradient-success">Join Room</span>
+            </h1>
+            <p className="subheading-font text-xl md:text-2xl text-neutral-gray-300 mb-3 leading-relaxed">
+              Enter a room code to join the fun!
+            </p>
+            <p className="body-font text-lg text-neutral-gray-400">
+              Get the 6-digit room code from your host and let&apos;s get started
+            </p>
+          </div>
 
         {/* Join Form */}
         <div className="max-w-lg mx-auto">

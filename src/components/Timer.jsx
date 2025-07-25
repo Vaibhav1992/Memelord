@@ -23,9 +23,9 @@ const Timer = ({ seconds, onTick, className = '' }) => {
   };
 
   const getTimerColor = () => {
-    if (displaySeconds <= 5) return 'text-red-400';
-    if (displaySeconds <= 10) return 'text-orange-400';
-    return 'text-white';
+    if (displaySeconds <= 5) return 'text-accent-red';
+    if (displaySeconds <= 10) return 'text-accent-orange';
+    return 'text-neutral-white';
   };
 
   const getProgressPercentage = (total = 45) => {
@@ -33,7 +33,7 @@ const Timer = ({ seconds, onTick, className = '' }) => {
   };
 
   return (
-    <div className={`relative inline-flex items-center justify-center ${className}`}>
+    <div className={`timer-container ${isUrgent ? 'urgent' : ''} ${className}`}>
       {/* Circular Progress Ring */}
       <svg 
         className="absolute inset-0 w-full h-full -rotate-90" 
@@ -45,8 +45,8 @@ const Timer = ({ seconds, onTick, className = '' }) => {
           cy="50"
           r="45"
           fill="none"
-          stroke="rgba(255, 255, 255, 0.1)"
-          strokeWidth="6"
+          stroke="rgba(255, 255, 255, 0.15)"
+          strokeWidth="4"
         />
         {/* Progress circle */}
         <circle

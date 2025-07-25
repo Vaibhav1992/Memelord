@@ -71,11 +71,12 @@ const MemeDisplay = ({ meme, className = '' }) => {
 
   if (!meme) {
     return (
-      <div className={`meme-container animate-fadeIn ${className}`}>
-        <div className="flex items-center justify-center h-32 text-gray-400">
+      <div className={`meme-container animate-fade-in ${className}`}>
+        <div className="flex items-center justify-center h-32 text-neutral-gray-400">
           <div className="text-center">
-            <div className="text-2xl mb-1">🎭</div>
-            <p className="heading-font text-sm">Waiting for meme...</p>
+            <div className="text-3xl mb-2 animate-pulse">🎭</div>
+            <p className="heading-font text-base">Waiting for meme...</p>
+            <div className="skeleton w-24 h-2 mx-auto mt-2"></div>
           </div>
         </div>
       </div>

@@ -61,20 +61,20 @@ const CaptionInput = ({ onSubmit, disabled, timer, maxLength = 200 }) => {
 
   if (disabled) {
     return (
-      <div className="card animate-fadeIn">
+      <div className="card animate-fade-in">
         <div className="text-center">
-          <div className="text-3xl mb-2">✅</div>
-          <h3 className="heading-font text-lg text-green-400 mb-1">
+          <div className="text-4xl mb-3 animate-bounce">✅</div>
+          <h3 className="heading-font text-xl text-gradient-success mb-2">
             Caption Submitted!
           </h3>
-          <p className="body-font text-gray-300 mb-2">
+          <p className="body-font text-neutral-gray-300 mb-3">
             Waiting for other players to finish...
           </p>
           
-          {/* Timer display */}
-          <div className="flex justify-center items-center gap-2 mb-2">
-            <span className="text-gray-400 text-sm">⏰</span>
-            <span className="text-white font-medium text-sm">{timer}s remaining</span>
+          {/* Enhanced timer display */}
+          <div className="badge badge-primary mx-auto">
+            <span className="text-lg">⏰</span>
+            <span className="font-medium">{timer}s remaining</span>
           </div>
           
           <div className="flex justify-center">
