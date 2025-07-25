@@ -75,12 +75,13 @@ const GameRoom = ({ socket, gameState, player, room, onLeaveRoom }) => {
     const isHost = player.id === room.hostId;
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 animate-fadeIn relative overflow-hidden">
-        {/* Animated background elements */}
+      <div className="min-h-screen bg-gradient-background animate-fade-in relative overflow-hidden">
+        {/* Enhanced animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-purple/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-green/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-secondary-blue/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-20 right-1/4 w-32 h-32 bg-accent-orange/15 rounded-full blur-2xl animate-pulse-slow"></div>
         </div>
 
         <div className="container mx-auto px-4 py-8 relative z-10">
@@ -88,16 +89,16 @@ const GameRoom = ({ socket, gameState, player, room, onLeaveRoom }) => {
           <div className="text-center mb-12">
             <div className="relative inline-block">
               <h1 className="heading-font text-5xl md:text-7xl text-white mb-6 drop-shadow-2xl">
-                🎭 <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-green-400 bg-clip-text text-transparent animate-pulse">Memelord</span>
+                🎭 <span className="text-gradient-primary animate-pulse">Memelord</span>
               </h1>
-              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-green-500 rounded-full opacity-50"></div>
+              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-primary rounded-full opacity-50"></div>
             </div>
-            <div className="flex items-center justify-center gap-6 text-lg text-gray-300 mt-6">
-              <div className="flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                <span className="text-2xl">🏠</span>
-                <span className="subheading-font font-bold text-white">Room: {room.code}</span>
+            <div className="flex items-center justify-center gap-6 text-lg text-neutral-gray-300 mt-6">
+              <div className="badge badge-primary text-base">
+                <span className="text-xl">🏠</span>
+                <span className="subheading-font font-bold">Room: {room.code}</span>
               </div>
-              <div className="flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+              <div className="badge badge-success text-base">
                 <span className="text-2xl">👥</span>
                 <span className="subheading-font font-bold text-white">{players.length}/{room.settings.maxPlayers} players</span>
               </div>
@@ -249,12 +250,12 @@ const GameRoom = ({ socket, gameState, player, room, onLeaveRoom }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 animate-fadeIn relative overflow-hidden">
-      {/* Animated background elements */}
+    <div className="min-h-screen bg-gradient-background animate-fade-in relative overflow-hidden">
+      {/* Enhanced animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-purple/20 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-green/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-secondary-blue/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
       </div>
 
       <div className="container mx-auto px-2 py-2 relative z-10">
@@ -262,7 +263,7 @@ const GameRoom = ({ socket, gameState, player, room, onLeaveRoom }) => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-2">
           <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2 lg:mb-0">
             <h1 className="heading-font text-2xl md:text-3xl text-white drop-shadow-2xl">
-              🎭 <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-green-400 bg-clip-text text-transparent">Memelord</span>
+              🎭 <span className="text-gradient-primary">Memelord</span>
             </h1>
             <div className="flex items-center gap-1 px-2 py-1 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
               <span className="text-sm">🏠</span>

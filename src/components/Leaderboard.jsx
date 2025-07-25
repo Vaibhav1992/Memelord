@@ -60,17 +60,17 @@ const Leaderboard = ({ players, scores, currentRound, currentPlayer }) => {
   const maxScore = Math.max(...Object.values(scores || {}), 0);
 
   return (
-    <div className="leaderboard-container animate-fadeIn">
-      <div className="text-center mb-2">
-        <h2 className="heading-font text-sm text-white mb-0.5">
-          🏆 Leaderboard
+    <div className="leaderboard-container animate-fade-in">
+      <div className="text-center mb-4">
+        <h2 className="heading-font text-lg text-white mb-2">
+          🏆 <span className="text-gradient-primary">Leaderboard</span>
         </h2>
-        <div className="flex items-center justify-center gap-2 text-xs text-gray-300">
-          <div className="flex items-center gap-1">
+        <div className="flex items-center justify-center gap-3 text-xs text-neutral-gray-300">
+          <div className="badge badge-primary">
             <span>🎯</span>
             <span>Round {currentRound}</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="badge badge-success">
             <span>👥</span>
             <span>{players.length} players</span>
           </div>
